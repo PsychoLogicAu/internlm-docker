@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  internlm-xcomposer2-4khd-7b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: internlm
+        HF_REPO: internlm-xcomposer2-4khd-7b
+        EXAMPLE_FILE: internlm-xcomposer2-4khd-7b_example.py
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: internlm-xcomposer2-4khd-7b
+    container_name: internlm-xcomposer2-4khd-7b
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
