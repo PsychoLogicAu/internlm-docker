@@ -67,7 +67,10 @@ ARG EXAMPLE_FILE
 COPY ${EXAMPLE_FILE} ./example.py
 
 # Set environment variables for PyTorch CUDA
-ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.6,max_split_size_mb:128"
+# https://pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf
+# ENV PYTORCH_CUDA_ALLOC_CONF="backend:cudaMallocAsync"
+# ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:128"
+ENV PYTORCH_CUDA_ALLOC_CONF="backend:native,max_split_size_mb:128,roundup_power2_divisions:[256:1,512:2,1024:4,>:8],garbage_collection_threshold:0.8,expandable_segments:True"
 
 # Set entrypoint to activate Conda environment and start bash shell
 ENTRYPOINT ["/bin/bash", "-c", "source activate conda && /bin/bash"]
