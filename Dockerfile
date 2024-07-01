@@ -50,6 +50,11 @@ USER $USERNAME
 # Copy Conda environment from dependencies stage
 COPY --from=base /opt/conda /opt/conda
 
+ARG PIP_EXTRA
+ENV PIP_EXTRA=$PIP_EXTRA
+# if PIP_EXTRA is not empty, install the extra packages
+RUN test -z "$PIP_EXTRA" || /opt/conda/bin/conda run -n conda pip install --no-cache-dir ${PIP_EXTRA}
+
 # Set environment variables
 ENV PATH /opt/conda/bin:$PATH
 ENV HF_HOME=/data/.cache/huggingface
@@ -69,8 +74,9 @@ COPY ${EXAMPLE_FILE} ./example.py
 # Set environment variables for PyTorch CUDA
 # https://pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf
 # ENV PYTORCH_CUDA_ALLOC_CONF="backend:cudaMallocAsync"
-# ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:128"
-ENV PYTORCH_CUDA_ALLOC_CONF="backend:native,max_split_size_mb:128,roundup_power2_divisions:[256:1,512:2,1024:4,>:8],garbage_collection_threshold:0.8,expandable_segments:True"
+ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:128"
+# expandable_segments:True <-- "RuntimeError: Unrecognized CachingAllocator option: expandable_segments", need newer PyTorch?
+# ENV PYTORCH_CUDA_ALLOC_CONF="backend:native,max_split_size_mb:128,roundup_power2_divisions:[256:1,512:2,1024:4,>:8],garbage_collection_threshold:0.8"
 
 # Set entrypoint to activate Conda environment and start bash shell
 ENTRYPOINT ["/bin/bash", "-c", "source activate conda && /bin/bash"]

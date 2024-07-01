@@ -8,6 +8,7 @@ services:
         HF_ORG: internlm
         HF_REPO: internlm-xcomposer2-4khd-7b
         EXAMPLE_FILE: internlm-xcomposer2-4khd-7b_example.py
+        PIP_EXTRA: ""
     shm_size: '16gb'
     deploy:
       resources:
@@ -22,3 +23,74 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
+  mini-internvl-chat-4b-v1-5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: OpenGVLab
+        HF_REPO: Mini-InternVL-Chat-4B-V1-5
+        EXAMPLE_FILE: Mini-InternVL-Chat-4B-V1-5_example.py
+        PIP_EXTRA: "peft flash_attn timm transformers[sentencepiece]"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: mini-internvl-chat-4b-v1-5
+    container_name: mini-internvl-chat-4b-v1-5
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+  internlm-xcomposer2-7b-4bit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: internlm
+        HF_REPO: internlm-xcomposer2-7b-4bit
+        EXAMPLE_FILE: internlm-xcomposer2-7b-4bit_example.py
+        PIP_EXTRA: "auto_gptq"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: internlm-xcomposer2-7b-4bit
+    container_name: internlm-xcomposer2-7b-4bit
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+  glm-4v-9b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: THUDM
+        HF_REPO: glm-4v-9b
+        EXAMPLE_FILE: glm-4v-9b_example.py
+        PIP_EXTRA: "tiktoken accelerate"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: glm-4v-9b
+    container_name: glm-4v-9b
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+
+    
