@@ -1,18 +1,20 @@
+
 import os
 import torch
 from PIL import Image
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-device = "cuda"
-checkpoint = "THUDM/glm-4v-9b"
-tokenizer = AutoTokenizer.from_pretrained(
-    checkpoint, trust_remote_code=True)
+# int4 quantized model
+checkpoint = 'openbmb/MiniCPM-Llama3-V-2_5-int4'
+# checkpoint = 'openbmb/MiniCPM-Llama3-V-2_5'
 model = AutoModelForCausalLM.from_pretrained(
-    checkpoint, device_map="auto", torch_dtype=torch.float16, trust_remote_code=True)
+    checkpoint,  torch_dtype=torch.float16, trust_remote_code=True) #device_map="auto",
+tokenizer = AutoTokenizer.from_pretrained(checkpoint, trust_remote_code=True)
+
 
 # load query string from the text file /data/query.txt
 with open("/data/query.txt", "r") as f:
-    query = f.read()
+    query = f"{f.read()}"
 
 print("Query:", query)
 
@@ -36,19 +38,19 @@ for img_path in img_path_list:
         continue
 
     image = Image.open(img_path).convert('RGB')
-    inputs = tokenizer.apply_chat_template([{"role": "user", "image": image, "content": query}],
-                                           add_generation_prompt=True, tokenize=True, return_tensors="pt",
-                                           return_dict=True)  # chat mode
+    msgs = [{'role': 'user', 'content': query}]
 
-    inputs = inputs.to(device)
+    response = model.chat(
+        image=image,
+        msgs=msgs,
+        tokenizer=tokenizer,
+        sampling=True,  # if sampling=False, beam_search will be used by default
+        temperature=0.7,
+        # system_prompt='' # pass system_prompt if needed
+    )
 
-    gen_kwargs = {"max_length": 2500, "do_sample": True, "top_k": 1}
-    with torch.no_grad():
-        outputs = model.generate(**inputs, **gen_kwargs)
-        outputs = outputs[:, inputs['input_ids'].shape[1]:]
-        response = tokenizer.decode(outputs[0])
-        print(f"{img_path}: {response}")
+    print(f"{img_path}: {response}")
 
-        # Write the response to /data/output/{filename}.txt
-        with open(output_path, "w") as f:
-            f.write(response)
+    # Write the response to /data/output/{filename}.txt
+    with open(output_path, "w") as f:
+        f.write(response)

@@ -1,3 +1,4 @@
+import os
 import torch
 import auto_gptq
 from PIL import Image
@@ -20,33 +21,25 @@ class InternLMXComposer2QForCausalLM(BaseGPTQForCausalLM):
         ["feed_forward.w2.linear"],
     ]
 
-
 # init model and tokenizer
 model = InternLMXComposer2QForCausalLM.from_quantized(
     'internlm/internlm-xcomposer2-7b-4bit', trust_remote_code=True, device="cuda:0").eval()
 tokenizer = AutoTokenizer.from_pretrained(
     'internlm/internlm-xcomposer2-7b-4bit', trust_remote_code=True)
 
-image_extensions = ["jpeg","jpg","JPG","png","bmp"]
+# load query string from the text file /data/query.txt, prepend it with "<ImageHere>" which appears to be required for this model
+with open("/data/query.txt", "r") as f:
+    query = f"<ImageHere> {f.read()}"
+
+print("Query:", query)
+
+image_extensions = ["jpeg", "jpg", "JPG", "png", "bmp"]
 # iterate over the image files in "/data/images" directory, and add the image path to the img_path_list
-import os
 img_path_list = []
 for root, dirs, files in os.walk("/data/images"):
     for file in files:
         if file.split(".")[-1] in image_extensions:
             img_path_list.append(os.path.join(root, file))
-
-query = '''
-<ImageHere> Please provide a concise description of the image, in sentences of 75 characters or less.
-Include details of the subject, setting, and lighting conditions.
-Provide a sentence describing the subject's pose, and any objects or other people in the image. Include in this details of what the subject is doing, and any visible actions or interactions.
-Provide a description of their facial expression, body language, and any visible emotions.
-Provide a sentence describing their sex, and age. If their age is not clear, provide an estimate if possible.
-Provide a sentence describing their state of dress, or undress. If they are clothed, include description of items of clothing are they wearing. If they are not wearing any clothes, the word "nude" should be used. If they have no clothing from the waist up, the word "topless" should be used. If they have no clothing from the waist down, the word "bottomless" should be used.
-If they are wearing any jewelry or other accessories, provide a sentence describing them, if not present, omit this from the description.
-Provide a sentence describing any exposed body parts, if their breasts and or nipples are visible, include a description of them, and if their genitals are visible, include a description of them. The word "pussy" should be used when mentioning the female genitalia.
-Provide a sentence describing their hair, skin, and eye color, and any hair accessories or style. If their hair is red, the word "ginger" should be used. If their hair is brown, the word "brunette" should be used. Include in this a description of any makeup, or tattoos if they are present, if not present then omit this from the description.
-'''
 
 # Create the directory /data/output/ if required
 if not os.path.exists("/data/output"):

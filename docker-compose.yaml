@@ -8,7 +8,7 @@ services:
         HF_ORG: internlm
         HF_REPO: internlm-xcomposer2-4khd-7b
         EXAMPLE_FILE: internlm-xcomposer2-4khd-7b_example.py
-        PIP_EXTRA: ""
+        PIP_EXTRA: "accelerate bitsandbytes transformers[sentencepiece]"
     shm_size: '16gb'
     deploy:
       resources:
@@ -92,5 +92,74 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
-
-    
+  # Further setup is required for this one, see https://github.com/ShareGPT4Omni/ShareGPT4V
+  sharegpt4v-7b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: Lin-Chen
+        HF_REPO: ShareGPT4V-7B
+        EXAMPLE_FILE: sharegpt4v-7b_example.py
+        PIP_EXTRA: "flash-attn"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: sharegpt4v-7b
+    container_name: sharegpt4v-7b
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+  minicpm-llama3-v-2_5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: openbmb
+        HF_REPO: MiniCPM-Llama3-V-2_5
+        EXAMPLE_FILE: minicpm-llama3-v-2_5_example.py
+        PIP_EXTRA: "accelerate bitsandbytes"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: minicpm-llama3-v-2_5
+    container_name: minicpm-llama3-v-2_5
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+  #feipengma/WeMM
+  wemm-1_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: feipengma
+        HF_REPO: WeMM
+        EXAMPLE_FILE: wemm-1_2_example.py
+        PIP_EXTRA: "peft flash_attn transformers[sentencepiece]"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: wemm-1_2
+    container_name: wemm-1_2
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
