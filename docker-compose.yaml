@@ -139,6 +139,29 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
+  internvl2-8b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HF_ORG: OpenGVLab
+        HF_REPO: InternVL2-8B
+        EXAMPLE_FILE: internvl2-8b_example.py
+        PIP_EXTRA: "accelerate bitsandbytes decord flash_attn sentencepiece timm transformers==4.37.2"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: internvl2-8b
+    container_name: internvl2-8b
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
   #feipengma/WeMM
   wemm-1_2:
     build:
