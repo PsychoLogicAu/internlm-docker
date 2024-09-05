@@ -39,14 +39,14 @@ image_path = "assets/georgia-tech.jpeg"
 input_prompt = "Describe this image."
 
 model_name = get_model_name_from_path(model_path)
+device = 'cuda'
+# device = 'cpu'
 # torch_dtype = torch.float16
 torch_dtype = torch.bfloat16
-# load_8bit = False
-load_4bit = True
-# device_map = "auto"
+load_8bit = True
+load_4bit = False
+device_map = "auto"
 
-# device = 'cuda'
-device = 'cpu'
 kwargs = {
     #     'quantization_config': BitsAndBytesConfig(
     #         load_in_4bit=True,
@@ -56,8 +56,9 @@ kwargs = {
     #     ),
     'device': device,
     'torch_dtype': torch_dtype,
-    # 'load_4bit': load_4bit,
-    # 'load_8bit': True,
+    'load_4bit': load_4bit,
+    'load_8bit': load_8bit,
+    'device_map': device_map
 }
 tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
                                                                        None,
