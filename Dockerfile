@@ -79,4 +79,4 @@ ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:
 # ENV PYTORCH_CUDA_ALLOC_CONF="backend:native,max_split_size_mb:128,roundup_power2_divisions:[256:1,512:2,1024:4,>:8],garbage_collection_threshold:0.8"
 
 # Set entrypoint to activate Conda environment and start bash shell
-ENTRYPOINT ["/bin/bash", "-c", "source activate conda && /bin/bash"]
+ENTRYPOINT ["/bin/bash", "-c", "source activate conda && python example.py"]
