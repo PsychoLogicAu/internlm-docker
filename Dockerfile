@@ -16,8 +16,10 @@ RUN conda create --name conda python=${PYTHON_VERSION} pip
 RUN /opt/conda/envs/conda/bin/pip install --no-cache-dir --upgrade pip
 
 # Activate Conda environment and install necessary packages
-RUN /opt/conda/bin/conda run -n conda pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 \
-    --extra-index-url https://download.pytorch.org/whl/cu118 
+# RUN /opt/conda/bin/conda run -n conda pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 \
+#     --extra-index-url https://download.pytorch.org/whl/cu118
+RUN /opt/conda/bin/conda run -n conda pip install torch==2.1.1+cu118 torchvision==0.16.1+cu118 \
+    --extra-index-url https://download.pytorch.org/whl/cu118
 RUN /opt/conda/bin/conda run -n conda pip install --no-cache-dir transformers einops "numpy<2"
 
 # Step 2: Final image
@@ -63,11 +65,18 @@ ENV HF_HOME=/data/.cache/huggingface
 ENV GIT_LFS_SKIP_SMUDGE=1
 
 WORKDIR /app/
-ARG HF_ORG
-ARG HF_REPO
-RUN git clone https://huggingface.co/${HF_ORG}/${HF_REPO}
 
-WORKDIR /app/${HF_REPO}
+ARG GIT_DOMAIN
+ARG GIT_ORG
+ARG GIT_REPO
+ARG CACHEBUST=1
+RUN git clone https://${GIT_DOMAIN}/${GIT_ORG}/${GIT_REPO}.git
+
+WORKDIR /app/${GIT_REPO}
+
+ARG GIT_BRANCH
+RUN test -z "$GIT_BRANCH" || git checkout $GIT_BRANCH
+
 ARG EXAMPLE_FILE
 COPY ${EXAMPLE_FILE} ./example.py
 
@@ -79,4 +88,4 @@ ENV PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.8,max_split_size_mb:
 # ENV PYTORCH_CUDA_ALLOC_CONF="backend:native,max_split_size_mb:128,roundup_power2_divisions:[256:1,512:2,1024:4,>:8],garbage_collection_threshold:0.8"
 
 # Set entrypoint to activate Conda environment and start bash shell
-ENTRYPOINT ["/bin/bash", "-c", "source activate conda && python example.py"]
+ENTRYPOINT ["/bin/bash", "-c", "source activate conda && /bin/bash -c 'python example.py'"]

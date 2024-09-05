@@ -1,12 +1,37 @@
 version: '3.9'
 services:
+  internvl2-llama3-76b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: OpenGVLab
+        GIT_REPO: InternVL2-Llama3-76B
+        EXAMPLE_FILE: internvl2-llama3-76b_example.py
+        PIP_EXTRA: "airllm bitsandbytes decord flash_attn timm"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: internvl2-llama3-76b
+    container_name: internvl2-llama3-76b
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
   internlm-xcomposer2-4khd-7b:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: internlm
-        HF_REPO: internlm-xcomposer2-4khd-7b
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: internlm
+        GIT_REPO: internlm-xcomposer2-4khd-7b
         EXAMPLE_FILE: internlm-xcomposer2-4khd-7b_example.py
         PIP_EXTRA: "accelerate bitsandbytes transformers[sentencepiece]"
     shm_size: '16gb'
@@ -28,8 +53,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: OpenGVLab
-        HF_REPO: Mini-InternVL-Chat-4B-V1-5
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: OpenGVLab
+        GIT_REPO: Mini-InternVL-Chat-4B-V1-5
         EXAMPLE_FILE: Mini-InternVL-Chat-4B-V1-5_example.py
         PIP_EXTRA: "peft flash_attn timm transformers[sentencepiece]"
     shm_size: '16gb'
@@ -51,8 +77,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: internlm
-        HF_REPO: internlm-xcomposer2-7b-4bit
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: internlm
+        GIT_REPO: internlm-xcomposer2-7b-4bit
         EXAMPLE_FILE: internlm-xcomposer2-7b-4bit_example.py
         PIP_EXTRA: "auto_gptq"
     shm_size: '16gb'
@@ -74,10 +101,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: THUDM
-        HF_REPO: glm-4v-9b
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: THUDM
+        GIT_REPO: glm-4v-9b
         EXAMPLE_FILE: glm-4v-9b_example.py
-        PIP_EXTRA: "tiktoken accelerate"
+        PIP_EXTRA: "accelerate bitsandbytes tiktoken"
     shm_size: '16gb'
     deploy:
       resources:
@@ -98,8 +126,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: Lin-Chen
-        HF_REPO: ShareGPT4V-7B
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: Lin-Chen
+        GIT_REPO: ShareGPT4V-7B
         EXAMPLE_FILE: sharegpt4v-7b_example.py
         PIP_EXTRA: "flash-attn"
     shm_size: '16gb'
@@ -121,8 +150,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: openbmb
-        HF_REPO: MiniCPM-Llama3-V-2_5
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: openbmb
+        GIT_REPO: MiniCPM-Llama3-V-2_5
         EXAMPLE_FILE: minicpm-llama3-v-2_5_example.py
         PIP_EXTRA: "accelerate bitsandbytes"
     shm_size: '16gb'
@@ -139,13 +169,38 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
+  minicpm-v-2.6:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: openbmb
+        GIT_REPO: MiniCPM-V-2_6
+        EXAMPLE_FILE: minicpm-v-2.6_example.py
+        PIP_EXTRA: "accelerate bitsandbytes flash_attn" #torch>=2.1.1
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: minicpm-v-2.6
+    container_name: minicpm-v-2.6
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
   internvl2-8b:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: OpenGVLab
-        HF_REPO: InternVL2-8B
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: OpenGVLab
+        GIT_REPO: InternVL2-8B
         EXAMPLE_FILE: internvl2-8b_example.py
         PIP_EXTRA: "accelerate bitsandbytes decord flash_attn sentencepiece timm transformers==4.37.2"
     shm_size: '16gb'
@@ -162,15 +217,16 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
-  internvl2-26b:
+  internvl2-4b:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: OpenGVLab
-        HF_REPO: InternVL2-26B
-        EXAMPLE_FILE: internvl2-26b_example.py
-        PIP_EXTRA: "accelerate bitsandbytes decord flash_attn sentencepiece timm transformers==4.37.2"
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: OpenGVLab
+        GIT_REPO: InternVL2-4B
+        EXAMPLE_FILE: internvl2-4b_example.py
+        PIP_EXTRA: "accelerate bitsandbytes decord flash_attn protobuf sentencepiece timm transformers"
     shm_size: '16gb'
     deploy:
       resources:
@@ -179,8 +235,8 @@ services:
             - driver: nvidia
               count: all
               capabilities: [ gpu ]
-    image: internvl2-26b
-    container_name: internvl2-26b
+    image: internvl2-4b
+    container_name: internvl2-4b
     volumes:
       - ./data:/data
     stdin_open: true
@@ -191,8 +247,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        HF_ORG: feipengma
-        HF_REPO: WeMM
+        GIT_DOMAIN: huggingface.co/
+        GIT_ORG: feipengma
+        GIT_REPO: WeMM
         EXAMPLE_FILE: wemm-1_2_example.py
         PIP_EXTRA: "peft flash_attn transformers[sentencepiece]"
     shm_size: '16gb'
@@ -205,6 +262,32 @@ services:
               capabilities: [ gpu ]
     image: wemm-1_2
     container_name: wemm-1_2
+    volumes:
+      - ./data:/data
+    stdin_open: true
+    tty: true
+  #NVEagle/Eagle-X5-7B
+  eagle-x5-7b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GIT_DOMAIN: github.com
+        GIT_ORG: PsychoLogicAu
+        GIT_REPO: EAGLE
+        GIT_BRANCH: fixup/dtype
+        EXAMPLE_FILE: eagle-x5-7b_example.py
+        PIP_EXTRA: "accelerate bitsandbytes fvcore scipy timm==0.9.11 transformers[sentencepiece]"
+    shm_size: '16gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    image: eagle-x5-7b
+    container_name: eagle-x5-7b
     volumes:
       - ./data:/data
     stdin_open: true
